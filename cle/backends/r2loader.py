@@ -3,17 +3,19 @@ from . import Backend
 
 import r2pipe
 
-try:
-    # r2pipe.open ('http://cloud.radare.org/cmd/', doStuff);
-    r2p = r2pipe
-except:
-    r2p = None
+# try:
+#     # r2pipe.open ('http://cloud.radare.org/cmd/', doStuff);
+#     r2p = r2pipe
+# except:
+# r2p = None
 
 
 import logging
 l = logging.getLogger("cle.r2loader")
 
 __all__ = ('r2Loader',)
+
+global info
 
 # def spawn(bv):
 #
@@ -27,7 +29,6 @@ __all__ = ('r2Loader',)
 
 class r2Loader(Backend):
     def __init__(self, binary, custom_arch=None, *args, **kwargs):
-
         if custom_arch is None:
             raise CLEError("Must specify custom_arch when loading r2test!")
 
@@ -37,16 +38,75 @@ class r2Loader(Backend):
         if self.binary is None:
             raise CLEError("File streaming isn't done yet.")
 
-        l.debug("yolo")
+        l.debug("Starting r2pipe..")
 
-        try:
-            print "yep"
-            # r2p = r2pipe.open(self.binary)
-        except:
-            raise CLEError("Opening r2pipe failed.")
+        r2p = r2pipe.open(self.binary)
+        l.debug("r2pipe opened!")
+        r2p.cmd('aaa')
+        l.debug("Running aaa")
+
+        self._r2o = {}
+
+        l.debug("Starting command loop...")
+
+        '''
+        |Usage: i Get info from opened file (see rabin2's manpage)
+        | Output mode:
+        | '*'                Output in radare commands
+        | 'j'                Output in json
+        | 'q'                Simple quiet output
+        | Actions:
+        | i|ij               Show info of current file (in JSON)
+        | iA                 List archs
+        | ia                 Show all info (imports, exports, sections..)
+        | ib                 Reload the current buffer for setting of the bin (use once only)
+        | ic                 List classes, methods and fields
+        | iC                 Show signature info (entitlements, ...)
+        | id                 Debug information (source lines)
+        | iD lang sym        demangle symbolname for given language
+        | ie                 Entrypoint
+        | iE                 Exports (global symbols)
+        | ih                 Headers (alias for iH)
+        | iHH                Verbose Headers in raw text
+        | ii                 Imports
+        | iI                 Binary info
+        | ik [query]         Key-value database from RBinObject
+        | il                 Libraries
+        | iL                 List all RBin plugins loaded
+        | im                 Show info about predefined memory allocation
+        | iM                 Show main address
+        | io [file]          Load info from file (or last opened) use bin.baddr
+        | ir|iR              Relocs
+        | is                 Symbols
+        | iS [entropy,sha1]  Sections (choose which hash algorithm to use)
+        | iV                 Display file version info
+        | iz                 Strings in data sections
+        | izz                Search for Strings in the whole binary
+        | iZ                 Guess size of binary program
+        '''
+        commands = ['i', 'iA', 'ie', 'iE', 'ih', 'ii', 'il', 'iM', 'ir', 'is', 'izz']
+
+        for command in commands:
+            command_j = command + 'j'
+            l.debug(command_j)
+            self._r2o[command] = r2p.cmdj(command_j)
+            l.debug(self._r2o[command])
+
+        # print self._r2o['iE']
+
+
+        r2p.quit()
+
+        l.debug("Done with r2pipe.")
+
+        # print self._r2o
+
+        #try:
+        #    print "yep"
+        #except:
+        #    raise CLEError("Opening r2pipe failed.")
 
         # for segaddress in Segments
-
 
         self.memory = "" #.add_backer(0, "y")
 
@@ -62,28 +122,29 @@ class r2Loader(Backend):
 
     @property
     def entry(self):
-        if self._custom_entry_point is not None:
-            return self._custom_entry_point + self.rebase_addr
-        return None # self.ida.idc.BeginEA() + self.rebase_addr
+        return self._r2o['ie'][0]['vaddr']
+        # if self._custom_entry_point is not None:
+    #         return self._custom_entry_point + self.rebase_addr
+    #     return None # self.ida.idc.BeginEA() + self.rebase_addr
 
     supported_filetypes = ['elf', 'pe', 'mach-o', 'unknown']
 
-    @property
-    def plt(self):
-        # I know there's a way to do this but BOY do I not want to do it right now
-        return {}
-
-    @property
-    def reverse_plt(self):
-        return {}
-
-    @staticmethod
-    def get_call_stub_addr(name): # pylint: disable=unused-argument
-        return None
-
-    @property
-    def is_ppc64_abiv1(self):
-        # IDA 6.9 segfaults when loading ppc64 abiv1 binaries so....
-        return False
+    # @property
+    # def plt(self):
+    #     # I know there's a way to do this but BOY do I not want to do it right now
+    #     return {}
+    #
+    # @property
+    # def reverse_plt(self):
+    #     return {}
+    #
+    # @staticmethod
+    # def get_call_stub_addr(name): # pylint: disable=unused-argument
+    #     return None
+    #
+    # @property
+    # def is_ppc64_abiv1(self):
+    #     # IDA 6.9 segfaults when loading ppc64 abiv1 binaries so....
+    #     return False
 
 from ..loader import Loader
