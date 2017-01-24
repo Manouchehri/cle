@@ -5,7 +5,7 @@ from ..errors import CLEError
 from . import Backend
 
 import r2pipe
-
+import struct
 # try:
 #     # r2pipe.open ('http://cloud.radare.org/cmd/', doStuff);
 #     r2p = r2pipe
@@ -100,11 +100,17 @@ class r2Loader(Backend):
             self._r2o[command] = r2p.cmdj(command_j)
             l.debug(self._r2o[command])
 
+        self._r2o['pc'] = r2p.cmdj('pcj $s')
+
         r2p.quit()
 
         l.debug("Done with r2pipe.")
 
-        self.memory = "" #.add_backer(0, "y")
+        # self.memory = "" #.add_backer(0, "y")
+
+        rawdata = self._r2o['pc']
+        packed = struct.pack("%dB" % (len(rawdata)), *rawdata)
+        self.memory.add_backer(0, packed)
 
         self.got_begin = None
         self.got_end = None
@@ -137,9 +143,9 @@ class r2Loader(Backend):
     # def get_call_stub_addr(name): # pylint: disable=unused-argument
     #     return None
     #
-    # @property
-    # def is_ppc64_abiv1(self):
-    #     # IDA 6.9 segfaults when loading ppc64 abiv1 binaries so....
-    #     return False
+    @property
+    def is_ppc64_abiv1(self):
+        # IDA 6.9 segfaults when loading ppc64 abiv1 binaries so....
+        return False
 
 from ..loader import Loader
