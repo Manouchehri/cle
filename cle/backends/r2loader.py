@@ -1,3 +1,6 @@
+
+
+
 from ..errors import CLEError
 from . import Backend
 
@@ -12,10 +15,9 @@ import r2pipe
 
 import logging
 l = logging.getLogger("cle.r2loader")
+import archinfo
 
 __all__ = ('r2Loader',)
-
-global info
 
 # def spawn(bv):
 #
@@ -24,19 +26,25 @@ global info
 #     r2p.quit()
 #
 #     for r2function in r2functions:
-#         bv.add_function(bv.platform, r2function['offset'])  # should do r2function['name'] as well
+#         bv.add_function(bv.platform, r2function['offset'])  # Should do r2function['name'] as well
 
 
 class r2Loader(Backend):
-    def __init__(self, binary, custom_arch=None, *args, **kwargs):
-        if custom_arch is None:
-            raise CLEError("Must specify custom_arch when loading r2test!")
+    """
+    This is a backend that uses radare2 (via r2pipe). Untested and experimental, use at your own risk.
+    """
+    def __init__(self, binary, *args, **kwargs):
+        """
+        :param binary: The file/binary to load.
+        :param custom_arch: The arch of the binary (this shouldn't be needed... but it is right now.)
+        """
 
-
-        super(r2Loader, self).__init__(binary, custom_arch=None, *args, **kwargs)
+        super(r2Loader, self).__init__(binary, *args, **kwargs)
 
         if self.binary is None:
-            raise CLEError("File streaming isn't done yet.")
+            raise CLEError("You need to give a file.")
+
+        self.set_arch(archinfo.arch_from_id("EM_386", 'le', '32'))  # TODO: Get this info from r2.
 
         l.debug("Starting r2pipe..")
 
@@ -45,11 +53,11 @@ class r2Loader(Backend):
         r2p.cmd('aaa')
         l.debug("Running aaa")
 
-        self._r2o = {}
+        self._r2o = {}  # This is where the output of radare2 will go.
 
         l.debug("Starting command loop...")
 
-        '''
+        '''This is for reference.
         |Usage: i Get info from opened file (see rabin2's manpage)
         | Output mode:
         | '*'                Output in radare commands
@@ -92,24 +100,11 @@ class r2Loader(Backend):
             self._r2o[command] = r2p.cmdj(command_j)
             l.debug(self._r2o[command])
 
-        # print self._r2o['iE']
-
-
         r2p.quit()
 
         l.debug("Done with r2pipe.")
 
-        # print self._r2o
-
-        #try:
-        #    print "yep"
-        #except:
-        #    raise CLEError("Opening r2pipe failed.")
-
-        # for segaddress in Segments
-
         self.memory = "" #.add_backer(0, "y")
-
 
         self.got_begin = None
         self.got_end = None
