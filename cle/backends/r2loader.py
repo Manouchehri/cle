@@ -13,6 +13,8 @@ except:
 import logging
 l = logging.getLogger("cle.r2loader")
 
+__all__ = ('r2Loader',)
+
 # def spawn(bv):
 #
 #     r2p.cmd('aaa')
@@ -43,4 +45,45 @@ class r2Loader(Backend):
         except:
             raise CLEError("Opening r2pipe failed.")
 
+        # for segaddress in Segments
+
+
+        self.memory = "" #.add_backer(0, "y")
+
+
+        self.got_begin = None
+        self.got_end = None
+        self.raw_imports = {}
+        self.current_module_name = None
+
+        self.imports = {} # self._get_imports()
+        self.resolved_imports = {}
+        self.linking = {} # self._get_linking_type()
+
+    @property
+    def entry(self):
+        if self._custom_entry_point is not None:
+            return self._custom_entry_point + self.rebase_addr
+        return None # self.ida.idc.BeginEA() + self.rebase_addr
+
     supported_filetypes = ['elf', 'pe', 'mach-o', 'unknown']
+
+    @property
+    def plt(self):
+        # I know there's a way to do this but BOY do I not want to do it right now
+        return {}
+
+    @property
+    def reverse_plt(self):
+        return {}
+
+    @staticmethod
+    def get_call_stub_addr(name): # pylint: disable=unused-argument
+        return None
+
+    @property
+    def is_ppc64_abiv1(self):
+        # IDA 6.9 segfaults when loading ppc64 abiv1 binaries so....
+        return False
+
+from ..loader import Loader
