@@ -811,4 +811,4 @@ class Loader(object):
 from .errors import CLEError, CLEOperationError, CLEFileNotFoundError, CLECompatibilityError
 from .memory import Clemory
 from .tls import ELFTLSObj, PETLSObj
-from .backends import IDABin, MetaELF, ELF, PE, ALL_BACKENDS, Backend, Symbol
+from .backends import IDABin, r2Loader, MetaELF, ELF, PE, ALL_BACKENDS, Backend, Symbol
