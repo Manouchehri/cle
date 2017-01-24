@@ -490,6 +490,7 @@ from .elf import ELF
 from .elfcore import ELFCore
 from .pe import PE
 from .idabin import IDABin
+from .r2loader import r2Loader
 from .blob import Blob
 from .cgc import CGC
 from .backedcgc import BackedCGC
@@ -502,5 +503,6 @@ ALL_BACKENDS = _ordered_dict((
     ('cgc', CGC),
     ('backedcgc', BackedCGC),
     ('ida', IDABin),
+    ('r2', r2Loader),
     ('blob', Blob)
 ))
