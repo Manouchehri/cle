@@ -92,7 +92,7 @@ class r2Loader(Backend):
         | izz                Search for Strings in the whole binary
         | iZ                 Guess size of binary program
         '''
-        commands = ['i', 'iA', 'ie', 'iE', 'ih', 'ii', 'il', 'iM', 'ir', 'is', 'izz']
+        commands = ['i', 'iA', 'ie', 'iE', 'ih', 'ii', 'il', 'iM', 'ir', 'is', 'iS', 'izz']
 
         for command in commands:
             command_j = command + 'j'
@@ -110,9 +110,18 @@ class r2Loader(Backend):
 
         rawdata = self._r2o['pc']
         packed = struct.pack("%dB" % (len(rawdata)), *rawdata)
-        self.memory.add_backer(0, packed)
 
-        self.got_begin = None
+
+
+        # self.memory.add_backer(0, packed)
+
+        self._r2o['']
+
+
+
+        for
+
+        elf.got_begin = None
         self.got_end = None
         self.raw_imports = {}
         self.current_module_name = None
