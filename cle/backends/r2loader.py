@@ -1,6 +1,3 @@
-
-
-
 from ..errors import CLEError
 from . import Backend
 
@@ -18,15 +15,6 @@ l = logging.getLogger("cle.r2loader")
 import archinfo
 
 __all__ = ('r2Loader',)
-
-# def spawn(bv):
-#
-#     r2p.cmd('aaa')
-#     r2functions = r2p.cmdj('aflj')
-#     r2p.quit()
-#
-#     for r2function in r2functions:
-#         bv.add_function(bv.platform, r2function['offset'])  # Should do r2function['name'] as well
 
 
 class r2Loader(Backend):
@@ -111,15 +99,11 @@ class r2Loader(Backend):
         rawdata = self._r2o['pc']
         packed = struct.pack("%dB" % (len(rawdata)), *rawdata)
 
-
-
         # self.memory.add_backer(0, packed)
 
         self._r2o['']
 
-
-
-        for
+        # TODO: Everything
 
         elf.got_begin = None
         self.got_end = None
