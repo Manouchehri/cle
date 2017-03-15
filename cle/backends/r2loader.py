@@ -107,6 +107,7 @@ class r2Loader(Backend):
 
         # p8 @ p8j 20 @ 0x08048034
         # p8 @ p8j 0x14 @ 0x08048034
+        # p8 @ p8j $SS @ $S
         
         elf.got_begin = None
         self.got_end = None
