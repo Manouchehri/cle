@@ -105,6 +105,9 @@ class r2Loader(Backend):
 
         # TODO: Everything
 
+        # p8 @ p8j 20 @ 0x08048034
+        # p8 @ p8j 0x14 @ 0x08048034
+        
         elf.got_begin = None
         self.got_end = None
         self.raw_imports = {}
